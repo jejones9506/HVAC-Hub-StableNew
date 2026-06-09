@@ -9,8 +9,14 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   useEffect(() => {
-    // Initialize auth + Supabase session persistence on app start (Step 2)
-    initializeApp();
+    // Safe wrapper for launch crash isolation
+    (async () => {
+      try {
+        await initializeApp();
+      } catch (e) {
+        console.log('[Launch] initializeApp error (safe):', e);
+      }
+    })();
   }, []);
 
   return (
