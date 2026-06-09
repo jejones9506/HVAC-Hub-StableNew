@@ -47,7 +47,7 @@ export default function HomeScreen() {
                 Welcome back, {user.name.split(' ')[0]}! ({user.role})
               </ThemedText>
             ) : (
-              <Pressable onPress={signIn} style={styles.loginButton}>
+              <Pressable onPress={() => signIn?.()} style={styles.loginButton}>
                 <ThemedText type="link">Sign in with Google (Supabase + Mock)</ThemedText>
               </Pressable>
             )}
