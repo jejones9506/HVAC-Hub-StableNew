@@ -1,48 +1,41 @@
-import React, { useEffect } from 'react';
-import { SafeAreaView, StyleSheet, View } from 'react-native';
+import React from 'react';
+import { SafeAreaView, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useHVACStore } from '@/store/hvacStore';
 
 export default function HomeScreen() {
-  const { 
-    user, 
-    isLoggedIn, 
-    equipment, 
-    pendingApprovalsCount, 
-    hasSeenOnboarding, 
-    setHasSeenOnboarding 
-  } = useHVACStore();
+  // Access store but do not call any functions or effects that might trigger undefined calls
+  const store = useHVACStore();
 
-  useEffect(() => {
-    setHasSeenOnboarding(true);
-  }, [setHasSeenOnboarding]);
-
-  // Very minimal render to test if store + basic themed components cause the launch crash
   return (
     <SafeAreaView style={styles.container}>
       <ThemedView style={styles.content}>
-        <ThemedText type="title">HVAC Hub - Store Test</ThemedText>
-        <ThemedText type="subtitle">Launch successful with store hook</ThemedText>
+        <ThemedText type="title">HVAC Hub - Store Data Test (no effects)</ThemedText>
+        <ThemedText type="subtitle">Testing pure store access on launch</ThemedText>
         
-        <ThemedText style={{ marginTop: 20 }}>
-          Equipment entries: {equipment?.length || 0}
+        <ThemedText style={{ marginTop: 16 }}>
+          Equipment: {store.equipment?.length ?? 'undefined'}
         </ThemedText>
         <ThemedText>
-          Pending approvals: {pendingApprovalsCount || 0}
+          Logged in: {store.isLoggedIn ? 'Yes' : 'No'}
         </ThemedText>
         <ThemedText>
-          Logged in: {isLoggedIn ? 'Yes' : 'No'}
+          Has seen onboarding: {store.hasSeenOnboarding ? 'Yes' : 'No'}
         </ThemedText>
-        {user && (
-          <ThemedText>
-            User: {user.name} ({user.role})
-          </ThemedText>
+        <ThemedText>
+          Pending approvals: {store.pendingApprovalsCount ?? 'undefined'}
+        </ThemedText>
+        {store.user ? (
+          <ThemedText>User: {store.user.name} ({store.user.role})</ThemedText>
+        ) : (
+          <ThemedText>No user</ThemedText>
         )}
-        <ThemedText style={{ marginTop: 20, opacity: 0.6 }}>
-          If this screen stays visible without crashing, the store and basic render are OK.
-          The previous full UI (lists, many Pressables, Modal, etc.) was the problem.
+
+        <ThemedText style={{ marginTop: 24, opacity: 0.7, fontSize: 13 }}>
+          If this screen appears and stays visible, the store data is accessible without side-effects or function calls from this component.
+          The previous crash was likely caused by the useEffect calling setHasSeenOnboarding or other render-time calls.
         </ThemedText>
       </ThemedView>
     </SafeAreaView>
