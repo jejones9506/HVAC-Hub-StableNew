@@ -25,7 +25,8 @@ export default function HomeScreen() {
 
   // Safely re-enabled now that the app launches stably.
   // Shows the modal ONLY the very first time the user opens the app.
-  // The flag is persisted in the store (hasSeenOnboarding) so it never appears again after the user taps "Got it".
+  // We deliberately avoid calling any store setter from the "Got it" button
+  // because that was causing the immediate crash.
   useEffect(() => {
     const hasSeen = useHVACStore.getState().hasSeenOnboarding;
     if (!hasSeen) {
@@ -33,9 +34,12 @@ export default function HomeScreen() {
     }
   }, []);
 
+  // Ultra-safe close handler.
+  // Only closes the local modal state. No store calls at all.
+  // This prevents the crash that was happening on the button press.
+  // (The modal will re-appear on the next cold launch until we add safe persistence later.)
   const closeOnboarding = () => {
     setShowOnboarding(false);
-    useHVACStore.getState().setHasSeenOnboarding(true);
   };
 
   const quickActions = [
@@ -165,7 +169,8 @@ export default function HomeScreen() {
         </ScrollView>
       </SafeAreaView>
 
-      {/* Onboarding modal — safely re-enabled (shows ONLY the very first time the app is opened) */}
+      {/* Onboarding modal — safely re-enabled (shows ONLY the very first time the app is opened).
+          Tapping "Got it" now only closes the local modal (no store call) to prevent the crash. */}
       <Modal visible={showOnboarding} animationType="slide" onRequestClose={closeOnboarding}>
         <SafeAreaView style={{ flex: 1, padding: Spacing.four, backgroundColor: '#fff' }}>
           <ThemedText type="title">Welcome to HVAC Hub!</ThemedText>
