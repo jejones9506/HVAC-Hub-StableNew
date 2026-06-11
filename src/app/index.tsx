@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Platform, Pressable, ScrollView, StyleSheet, View, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -23,9 +23,20 @@ export default function HomeScreen() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const recentEquipment = equipment.slice(0, 3);
 
-  // NOTE: The previous useEffect that called setHasSeenOnboarding(true) was causing the immediate launch crash.
-  // It has been removed. The onboarding modal stays hidden for now (showOnboarding is never set to true).
-  // We can re-enable the modal + the "Got it" flow later once everything is stable.
+  // Safely re-enabled now that the app launches stably.
+  // Shows the modal ONLY the very first time the user opens the app.
+  // The flag is persisted in the store (hasSeenOnboarding) so it never appears again after the user taps "Got it".
+  useEffect(() => {
+    const hasSeen = useHVACStore.getState().hasSeenOnboarding;
+    if (!hasSeen) {
+      setShowOnboarding(true);
+    }
+  }, []);
+
+  const closeOnboarding = () => {
+    setShowOnboarding(false);
+    useHVACStore.getState().setHasSeenOnboarding(true);
+  };
 
   const quickActions = [
     { label: 'Search Equipment', icon: 'magnifyingglass', route: '/equipment' as const },
@@ -154,11 +165,8 @@ export default function HomeScreen() {
         </ScrollView>
       </SafeAreaView>
 
-      {/* Onboarding modal remains in the file but is never shown (showOnboarding is always false).
-          We removed the useEffect that was crashing on launch. We can re-enable the modal later. */}
-      <Modal visible={showOnboarding} animationType="slide" onRequestClose={() => {
-        setShowOnboarding(false);
-      }}>
+      {/* Onboarding modal — safely re-enabled (shows ONLY the very first time the app is opened) */}
+      <Modal visible={showOnboarding} animationType="slide" onRequestClose={closeOnboarding}>
         <SafeAreaView style={{ flex: 1, padding: Spacing.four, backgroundColor: '#fff' }}>
           <ThemedText type="title">Welcome to HVAC Hub!</ThemedText>
           <ThemedText style={{ marginTop: Spacing.three }}>This app is built for apprentices to master techs. Here's a quick tour:</ThemedText>
@@ -169,9 +177,7 @@ export default function HomeScreen() {
           <ThemedText>• Walkthroughs: Generate code-compliant job steps, PPE, tools.</ThemedText>
           <ThemedText>• Profile: Uploads, badges (gamification), job logs, admin approvals.</ThemedText>
           <ThemedText style={{ marginTop: Spacing.two }}>All data verified via admin loop. Sign in to save prefs/personality.</ThemedText>
-          <Pressable style={{ backgroundColor: '#208AEF', padding: 16, borderRadius: 8, marginTop: Spacing.four, alignItems: 'center' }} onPress={() => {
-            setShowOnboarding(false);
-          }}>
+          <Pressable style={{ backgroundColor: '#208AEF', padding: 16, borderRadius: 8, marginTop: Spacing.four, alignItems: 'center' }} onPress={closeOnboarding}>
             <ThemedText style={{ color: 'white', fontWeight: '600' }}>Got it, Start Exploring!</ThemedText>
           </Pressable>
           <ThemedText type="small" style={{ textAlign: 'center', marginTop: Spacing.two, opacity: 0.6 }}>You can replay this from Profile later.</ThemedText>
