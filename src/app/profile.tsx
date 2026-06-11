@@ -302,7 +302,41 @@ export default function ProfileScreen() {
                   Changes here and in the AI tab are saved locally and will sync to your Supabase profile.
                 </ThemedText>
               </ThemedView>
+{/* NEW: Quick Links to Admin, TOS, Terminology, Diagrams (stable since launch fix) */}
+<ThemedView style={styles.card}>
+  <ThemedText type="subtitle">Quick Links</ThemedText>
+  <ThemedText type="small" style={{ marginBottom: 12, opacity: 0.8 }}>
+    Access the full admin portal, terms of service, terminology reference, and educational diagrams.
+  </ThemedText>
 
+  <Pressable 
+    style={[styles.secondaryBtn, { marginBottom: 8 }]} 
+    onPress={() => router.push('/admin')}
+  >
+    <ThemedText style={{ color: '#208AEF' }}>Admin Portal (Master / Lower Admin)</ThemedText>
+  </Pressable>
+
+  <Pressable 
+    style={[styles.secondaryBtn, { marginBottom: 8 }]} 
+    onPress={() => router.push('/tos')}
+  >
+    <ThemedText style={{ color: '#208AEF' }}>Terms of Service (General + Lower Admin Rules)</ThemedText>
+  </Pressable>
+
+  <Pressable 
+    style={[styles.secondaryBtn, { marginBottom: 8 }]} 
+    onPress={() => router.push('/terminology')}
+  >
+    <ThemedText style={{ color: '#208AEF' }}>HVAC Terminology (Searchable Definitions)</ThemedText>
+  </Pressable>
+
+  <Pressable 
+    style={styles.secondaryBtn} 
+    onPress={() => router.push('/diagrams')}
+  >
+    <ThemedText style={{ color: '#208AEF' }}>Educational Diagrams (10 with Moving-Parts Notes)</ThemedText>
+  </Pressable>
+</ThemedView>
               {/* My Uploads (Step 11) */}
               <ThemedView style={styles.card}>
                 <ThemedText type="subtitle">My Uploads (Notes, Photos, Videos)</ThemedText>
